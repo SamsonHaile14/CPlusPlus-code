@@ -64,62 +64,61 @@ void playGame(  Deck drawPile[], Deck cascadePile[], Deck cascadeHide[],
 
     char key;
 
-//  mvaddstr( 34, 0, " To move cards, Press lowercase key corresponding to pile, and second number corresponding to destination" );
     do{
 
-    mvaddstr( 35, 0, "Enter Selection:    " );
-    move( 35, 17);
-    key = getch();
+     mvaddstr( 35, 0, "Enter Selection:    " );
+     move( 35, 17);
+     key = getch();
 
-    switch( key )
-       {
+     switch( key )
+        {
 
-	case 'D':
+	 case 'D':
 
-	   if( !drawPile[0].empty() )
-	      {
-	       drawPile[1].relocateTop(drawPile[2]);
-	       drawPile[0].relocateTop(drawPile[1]);
- 	      }
+	    if( !drawPile[0].empty() )
+	       {
+	        drawPile[1].relocateTop(drawPile[2]);
+	        drawPile[0].relocateTop(drawPile[1]);
+ 	       }
 
-	   break;
+	    break;
 		 
-        case 'R':
+         case 'R':
 
-	   drawPile[1].relocateTop( drawPile[0] );
+	    drawPile[1].relocateTop( drawPile[0] );
 
-	   while( !drawPile[2].empty() )
-	      drawPile[2].relocateTop( drawPile[0] );
+	    while( !drawPile[2].empty() )
+	       drawPile[2].relocateTop( drawPile[0] );
 
-	   break;
+	    break;
 
-	case 'Q':
+	 case 'Q':
 
-	   while( (key != 'Y') && (key != 'N') )
-	      {
-	       mvaddstr( 37, 0, " Are you sure you want to quit? (Press Y for yes, N for no)     " );
-	       move( 37, 61 );
-	       key = getch();
-	      }
+	    while( (key != 'Y') && (key != 'N') )
+	       {
+	        mvaddstr( 37, 0, " Are you sure you want to quit? (Press Y for yes, N for no)     " );
+	        move( 37, 61 );
+	        key = getch();
+	       }
 
-	   if( key == 'Y' )//quit if user confirms
-		  return;			
+	    if( key == 'Y' )//quit if user confirms
+		   return;			
 
-           mvaddstr( 37, 0, "                                                                 " );
+            mvaddstr( 37, 0, "                                                                 " );
 
-	   break;
+	    break;
 
-	case '#':
-	   moveCard( drawPile, cascadePile, cascadeHide, suitPile, suitHide );
+	 case '#':
+	    moveCard( drawPile, cascadePile, cascadeHide, suitPile, suitHide );
 
-	break;
+	 break;
 
-       }
+        }
 
-    unnaturalStates( drawPile, cascadePile, cascadeHide, suitPile, suitHide );
-    refreshScrn( drawPile, cascadePile, cascadeHide, suitPile );
+     unnaturalStates( drawPile, cascadePile, cascadeHide, suitPile, suitHide );
+     refreshScrn( drawPile, cascadePile, cascadeHide, suitPile );
 
-    }while(true);
+     }while(true);
 
    }
 
@@ -135,12 +134,12 @@ void moveCard(  Deck drawPile[], Deck cascadePile[], Deck cascadeHide[],
 
     //receive input for source and destination decks
     mvaddstr( 37, 0, "Enter stack cards are to be removed from:");
-    move( 37, 43 );
+    move( 37, 45 );
     echochar(' '); 
     srcDeck = getchar();
 		 
     mvaddstr( 37, 0, "Enter stack cards are to be placed in:     ");
-    move( 37, 44 );
+    move( 37, 46 );
     echochar(' '); 
     destDeck = getchar();
 
@@ -159,12 +158,13 @@ void moveCard(  Deck drawPile[], Deck cascadePile[], Deck cascadeHide[],
     	else	//if not listed, no card is to be removed
            count = 0;
 
-    //proceed with transfer process
+    //transfer process
     if( count == 0 )
        {
         mvaddstr(38,0,"invalid pile(s) selected");
 	return;
        }
+
     	else if( ptr->empty() )
 	   {
             mvaddstr( 38, 3, "No cards to pull from chosen pile");
@@ -178,7 +178,6 @@ void moveCard(  Deck drawPile[], Deck cascadePile[], Deck cascadeHide[],
 
     if( ((srcDeck>= 'e') && (srcDeck<='l')) && !( (destDeck>='a') && (destDeck<='d') ) )//determine # cards to be removed from the tableau
        {
-
         char value;
         count = 0;
         mvaddstr( 38, 3, "How many cards are to be removed from the tableau(enter two digits): ");
@@ -187,27 +186,31 @@ void moveCard(  Deck drawPile[], Deck cascadePile[], Deck cascadeHide[],
 
         do{
 
-        for( int a = 0; a<2; a++ ) //retrieve number of cards to be removed
-	   {
+         for( int a = 0; a<2; a++ ) //retrieve number of cards to be removed
+	    {
 
-	    do{
+	     move(38, 71+a);
+	     value = getchar();
 
-	    value = getchar();
+	     if( (value>='0') && (value<='9') )
+	        count += (10-9*a )*((int)(value-'0'));
 
-	    if( ( (a==0)&&( (value!='0') && (value!='1') ) ) || ( (a==1) && ((value<'0')|| (value>'9')) ) )
-	       {
-	        mvaddstr(38,0,"invalid digit/number. Try again");
-	        a = 0;
-	        count = 0;
-	       }
+	     else
+		{
+		 mvaddstr(38,0,"invalid digit. Try again");
+	         echochar(' ');
+		 a = 0;
+		}
+	    }
 
-	    }while(( (a==0)&&( (value!='0') && (value!='1') ) ) || ( (a==1) && ((value<'0')|| (value>'9')) ));
+         if( (count > 13) || (count < 0) )
+ 	    {
+	     mvaddstr(38,0,"invalid count. Try again");
+	     echochar(' ');
+	     count = ptr->size();
+	    }
 
-	    count += (10-9*a )*((int)(value-'0'));
-
-	   }
-
-        }while( ptr->size() > count ); //repeat until acceptable count reached
+        }while( ptr->size() < count ); //repeat until acceptable count reached
 
         for( int x = 0; x<(count-1); x++ )
            ptr->relocateTop( extraCards );
@@ -216,21 +219,25 @@ void moveCard(  Deck drawPile[], Deck cascadePile[], Deck cascadeHide[],
 
         if( (destDeck>= 'e') && (destDeck<='l') )	//destination is the tableau
            {
-
             string names[5] = {"Diamonds", "Spades", "Hearts", "Clubs", "Diamonds"};
             int color = 0;//0 = red, 1 = black
 
-            for( int indx = 0; indx < 4; indx++ )//determine needed corresponding color
-	       {
+	    if( !(cascadePile[ (int)(destDeck-'e') ]).empty() )
+		{
 
-	        if( (cascadePile[ (int)(destDeck-'e') ].topInfo()).suit == names[indx])
-	           color = indx % 2; 
-	       }
+		 for( int indx = 0; indx < 4; indx++ )//determine needed corresponding color
+	            {
+
+	             if( (cascadePile[ (int)(destDeck-'e') ].topInfo()).suit == names[indx])
+	                color = indx % 2; 
+
+	            }
+
+		}
 
              //moving king onto empty cascade
             if( ( cascadePile[ (int)(destDeck-'e') ].empty() ) &&  
-	        ( (ptr->topInfo()).rank == 13 ) &&
-	        ( cascadeHide[ (int)(destDeck-'e') ].empty() ) )
+	        ( (ptr->topInfo()).rank == 13 ) )
                {
 	        ptr->relocateTop( cascadePile[ (int)(destDeck-'e') ] );
 	       }
@@ -240,21 +247,23 @@ void moveCard(  Deck drawPile[], Deck cascadePile[], Deck cascadeHide[],
 		 	   ( (ptr->topInfo()).suit == names[color+3] ) ) &&  
 			   ( ( (ptr->topInfo()).rank+1 ) == (cascadePile[ (int)(destDeck-'e') ].topInfo()).rank ) )
                    {
-	            ptr->relocateTop( cascadePile[ (int)(destDeck-'e') ] );	
+	            ptr->relocateTop( cascadePile[ (int)(destDeck-'e') ] );
+
+	            for( int x = 0; x<extraCards.size();count++ ) //move rest of cards
+	               extraCards.relocateTop( cascadePile[ (int)(destDeck-'e') ]);
+	
 	           }
 
 	        else
 	           {
+
+		    for(int x = 0; x<extraCards.size();x++ ) //move cards back
+		       extraCards.relocateTop( *(ptr) );
+
 	            mvaddstr( 38, 3, "Invalid selection ");
 	            count = 0;
 	           }
-
-	    if( count >1 ) //move rest of cards
-	       {
-	        for( int x = 0; x<(count-1);count++ )
-		   extraCards.relocateTop( cascadePile[ (int)(destDeck-'e') ]);
-	       }
-
+	       
 	   }
 
 	else if( (destDeck>='a') && (destDeck<='d') ) //destination is foundation
@@ -305,7 +314,16 @@ void unnaturalStates( Deck drawPile[], Deck cascadePile[], Deck cascadeHide[],
 
     //visible draw pile has no card, but corresponding invisible one does
     if( drawPile[1].empty() )
-	drawPile[2].relocateTop( drawPile[1] );
+       drawPile[2].relocateTop( drawPile[1] );
+
+    //visible cascade pile has no card, but corresponding invisible one does
+    for( int x = 0; x<8; x++ )
+       {
+
+	if( cascadePile[x].empty() )
+	   cascadeHide[x].relocateTop( cascadePile[x] );
+
+       }
 
    }
 

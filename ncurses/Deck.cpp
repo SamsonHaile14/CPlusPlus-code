@@ -255,7 +255,16 @@ bool Deck::empty()
 Card Deck::topInfo()
 	{
 
-	 return set.top();
+	 Card blank;
+
+	 blank.suit = "blank";
+	 blank.rank = 0;
+
+	 if( !(empty()) )
+	    return set.top();
+
+	 else
+	    return blank;
 
 	}
 
